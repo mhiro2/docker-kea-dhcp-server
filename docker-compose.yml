@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  kea:
+    build: .
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./kea-dhcp4.conf:/usr/local/etc/kea/kea-dhcp4.conf
+    network_mode: host
+    depends_on:
+      - kea-db
+    restart: always
+
+  kea-db:
+    image: mysql:5.7
+    ports:
+      - 127.0.0.1:3306:3306
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - kea-db_data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_DATABASE: dhcpdb
+      MYSQL_ROOT_PASSWORD: dhcpdb
+    restart: always
+
+volumes:
+  kea-db_data:
+
